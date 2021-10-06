@@ -13,7 +13,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as sig
 from scipy.fft import fft
- 
+
+
+
 # Datos generales de la simulación
 fs = 1000 # frecuencia de muestreo (Hz)
 N = 1000   # cantidad de muestras
@@ -137,5 +139,14 @@ plt.plot( np.array([-q/2, -q/2, q/2, q/2]), np.array([0, N/bins, N/bins, 0]), '-
 plt.title( 'Ruido de cuantización para {:d} bits - $\pm V_R= $ {:3.1f} V - q = {:3.3f} V'.format(B, Vf, q))
 
 plt.show()
+
+#%% Inciso B
+# Datos del ADC
+B = 8 # bits
+q = Vf/2**B # Volts
+ 
+# datos del ruido
+kn = 1
+pot_ruido = q**2/12 * kn # Watts (potencia de la señal 1 W)
 
  
