@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 import scipy.signal as sig
 from scipy.fft import fft, fftshift
 import matplotlib.patches as mpatches
+from pandas import DataFrame
+from IPython.display import HTML
 
 def mi_Bartlett_window( N=2, figura=1 ):
     ##la funcion interta armar un triangulo
@@ -201,9 +203,27 @@ plt.show()
 #######################################################################################################################
 #%% Hasta aca comprobe que las ventanas son iguales o muy parecidas ahora uso las de scipy y eso
 #######################################################################################################################
-#Bartlett
 NEW_N=10*N
 f=np.arange(0,fs,fs/(NEW_N))
+#rectangular
+Rectangular=sig.windows.boxcar(N)
+Rectangular_fft=fft(Rectangular,NEW_N)
+Rectangular_mag=np.abs(fftshift(Rectangular_fft))/np.abs(Rectangular_fft[0])
+##Imprimo las ventanas en omega
+plt.figure(figura)
+figura=figura+1
+with np.errstate(divide='ignore', invalid='ignore'):
+    Rectangular_response=20*np.log10(Rectangular_mag)
+    
+plt.plot(f,Rectangular_response)
+plt.title('FFT: Rectangular_window')
+plt.xlabel('Frecuencia [Hz]')
+plt.xlim(490,500)
+plt.ylabel('Magnitud [dB')
+plt.ylim(-50,2)
+plt.show()
+
+#Bartlett
 Bartlett_fft=fft(Bartlett,NEW_N)
 Bartlett_mag=np.abs(fftshift(Bartlett_fft))/np.abs(Bartlett_fft[0])
 #print(Bartlett_mag[4500])
@@ -280,49 +300,92 @@ plt.show()
 #######################################################################################################################
 ##Como mis respuestas estan centradas en 500 hz
 ##el primer max y el primer min lo busco pasado la mitad del array
+print('Para Rectangular 0 dB indice:',find_nearest(Rectangular_response, 0))
+print('Frecuencia hallada=',f[find_nearest(Rectangular_response, 0)])
+print('Para Rectangular -3 dB indice:',find_nearest(Rectangular_response, -3))
+print('Frecuencia hallada=',f[find_nearest(Rectangular_response, -3)])
+##Como mis respuestas estan centradas en 500 hz
+##el primer max y el primer min lo busco pasado la mitad del array
+mitad_superior=Rectangular_response[len(Rectangular_response)//2:]
+mitad_f=len(f)/2
+##El primer 0 a ojo vale -346 asique le busco eso todos los demas deberian ser mas profundos
+primer_cero=find_nearest(mitad_superior,-346.808)
+print('Para Rectangular -inf dB indice:',primer_cero)
+indice=int(mitad_f+primer_cero)
+print('Frecuencia hallada=',f[indice])
+print('Para Rectangular maximo primer lobulo indice:',find_nearest(mitad_superior[primer_cero:], 0),'por encima del primer cero')
+print('Osea:',primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
+indice=int(mitad_f+primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
+print('Frecuencia hallada=',f[indice])
+
 print('Para Bartlett 0 dB indice:',find_nearest(Bartlett_response, 0))
+print('Frecuencia hallada=',f[find_nearest(Bartlett_response, 0)])
 print('Para Bartlett -3 dB indice:',find_nearest(Bartlett_response, -3))
+print('Frecuencia hallada=',f[find_nearest(Bartlett_response, -3)])
 ##Como mis respuestas estan centradas en 500 hz
 ##el primer max y el primer min lo busco pasado la mitad del array
 mitad_superior=Bartlett_response[len(Bartlett_response)//2:]
+mitad_f=len(f)/2
 ##El primer 0 a ojo vale -300 asique le busco eso todos los demas deberian ser mas profundos
 primer_cero=find_nearest(mitad_superior,-300)
 print('Para Bartlett -inf dB indice:',primer_cero)
+indice=int(mitad_f+primer_cero)
+print('Frecuencia hallada=',f[indice])
 print('Para Bartlett maximo primer lobulo indice:',find_nearest(mitad_superior[primer_cero:], 0),'por encima del primer cero')
 print('Osea:',primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
+indice=int(mitad_f+primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
+print('Frecuencia hallada=',f[indice])
 
 print('Para Hann 0 dB indice:',find_nearest(Hann_response, 0))
+print('Frecuencia hallada=',f[find_nearest(Hann_response, 0)])
 print('Para Hann -3 dB indice:',find_nearest(Hann_response, -3))
+print('Frecuencia hallada=',f[find_nearest(Hann_response, -3)])
 ##Como mis respuestas estan centradas en 500 hz
 ##el primer max y el primer min lo busco pasado la mitad del array
 mitad_superior=Hann_response[len(Hann_response)//2:]
 ##El primer 0 a ojo vale -69 asique le busco eso todos los demas deberian ser mas profundos
 primer_cero=find_nearest(mitad_superior,-69)
 print('Para Hann -inf dB indice:',primer_cero)
+indice=int(mitad_f+primer_cero)
+print('Frecuencia hallada=',f[indice])
 print('Para Hann maximo primer lobulo indice:',find_nearest(mitad_superior[primer_cero:], 0),'por encima del primer cero')
 print('Osea:',primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
+indice=int(mitad_f+primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
+print('Frecuencia hallada=',f[indice])
 
 print('Para Blackman 0 dB indice:',find_nearest(Blackman_response, 0))
+print('Frecuencia hallada=',f[find_nearest(Blackman_response, 0)])
 print('Para Blackman -3 dB indice:',find_nearest(Blackman_response, -3))
+print('Frecuencia hallada=',f[find_nearest(Blackman_response, -3)])
 ##Como mis respuestas estan centradas en 500 hz
 ##el primer max y el primer min lo busco pasado la mitad del array
 mitad_superior=Blackman_response[len(Blackman_response)//2:]
 ##El primer 0 a ojo vale -108 asique le busco eso todos los demas deberian ser mas profundos
 primer_cero=find_nearest(mitad_superior,-108)
 print('Para Blackman -inf dB indice:',primer_cero)
+indice=int(mitad_f+primer_cero)
+print('Frecuencia hallada=',f[indice])
 print('Para Blackman maximo primer lobulo indice:',find_nearest(mitad_superior[primer_cero:], 0),'por encima del primer cero')
 print('Osea:',primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
+indice=int(mitad_f+primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
+print('Frecuencia hallada=',f[indice])
 
 print('Para Flattop 0 dB indice:',find_nearest(Flattop_response, 0))
+print('Frecuencia hallada=',f[find_nearest(Flattop_response, 0)])
 print('Para Flattop -3 dB indice:',find_nearest(Flattop_response, -3))
+print('Frecuencia hallada=',f[find_nearest(Flattop_response, -3)])
 ##Como mis respuestas estan centradas en 500 hz
 ##el primer max y el primer min lo busco pasado la mitad del array
 mitad_superior=Flattop_response[len(Flattop_response)//2:]
 ##El primer 0 a ojo vale -108 asique le busco eso todos los demas deberian ser mas profundos
 primer_cero=find_nearest(mitad_superior,-108)
 print('Para Flattop -inf dB indice:',primer_cero)
+indice=int(mitad_f+primer_cero)
+print('Frecuencia hallada=',f[indice])
 print('Para Flattop maximo primer lobulo indice:',find_nearest(mitad_superior[primer_cero:], 0),'por encima del primer cero')
 print('Osea:',primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
+indice=int(mitad_f+primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
+print('Frecuencia hallada=',f[indice])
 
 #######################################################################################################################
 #%% Armo el filtrado
@@ -332,7 +395,7 @@ f=np.arange(0,fs,fs/N)
 t=np.arange(0,1,ts)
 f1=(np.pi/2)*1/(2*np.pi)*fs
 f2=(13/25*np.pi)*1/(2*np.pi)*fs
-mi_senal=np.sin(2*np.pi*f1*t)+10**(-10/20)*np.sin(2*np.pi*(f2)*t)
+mi_senal=np.sin(2*np.pi*f1*t)+10**(-40/20)*np.sin(2*np.pi*(f2)*t)
 ###Muestro Bartlett
 salida=mi_senal*Bartlett
 salida_fft=fft(salida,NEW_N)
@@ -420,3 +483,25 @@ plt.xlabel('Frecuencia [Hz]')
 plt.ylabel('Magnitud [dB]')
 #plt.ylim(-140,5)
 plt.show()
+
+#######################################
+# Tu simulación que genere resultados #
+#######################################
+factor_de_normalizacion=(fs/N)
+tus_resultados = [ 
+                   [501, 499.6], # <-- acá debería haber numeritos :)
+                   [502, 499.40000000000003], # <-- acá debería haber numeritos :)
+                   [509.6/factor_de_normalizacion, 499.3/factor_de_normalizacion], # <-- acá debería haber numeritos :)
+                   [532.5/factor_de_normalizacion, 499.20000000000005/factor_de_normalizacion], # <-- acá debería haber numeritos :)
+                   [547.1/factor_de_normalizacion, 498.1/factor_de_normalizacion] # <-- acá debería haber numeritos :)
+                 ]
+tus_resultados=np.abs(np.array(tus_resultados)-500)/10
+df = DataFrame(tus_resultados, columns=['$\Omega_0$', '$W_2$'],
+               index=[  
+                        'Rectangular',
+                        'Bartlett',
+                        'Hann',
+                        'Blackman',
+                        'Flat-top'
+                     ])
+HTML(df.to_html())
