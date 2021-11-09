@@ -14,6 +14,14 @@ from pandas import DataFrame
 from IPython.display import HTML
 
 #######################################################################################################################
+#%% Trato de definir para calculo de periodograma de blackman y tuckey
+#######################################################################################################################
+import spectrum
+from spectrum.datasets import marple_data
+from pylab import legend, ylim
+norm = True
+sides = 'centerdc'
+#######################################################################################################################
 #%% Inicio de la simulación
 #######################################################################################################################
 plt.close('all')
@@ -42,6 +50,7 @@ noise_power=a1/(10**(SNR/10))
 
 omega_0=np.pi/2
 fr=np.random.uniform(low=-1/2, high=1/2, size=200)
+
 omega_1=omega_0+fr*2*np.pi/N
 ## como uno es de (200,1) y el otro es de (1000,1) no puedo hacer el producto
 ##cambio los ejes para que sea (200,1)*(1,1000)
@@ -50,10 +59,11 @@ omega_1=omega_0+fr*2*np.pi/N
 ###Ya que hacer una matriz 3D me la complica al pedo
 ####################
 noise_0=np.random.normal(loc=0,scale=np.sqrt(noise_power[0]),size=(1000,200))
-
-var=np.var(noise)
-mean=np.mean(noise)
-x_0=a1*np.sin(2*np.pi*omega_1.reshape(1,200)*(fs/(2*np.pi))*t.reshape(1000,1)) + noise_0
+##Verificacion de las caracteristicas de mi ruido
+# var=np.var(noise_0)
+# mean=np.mean(noise_0)
+senal=np.sqrt(2*a1)*np.sin(2*np.pi*omega_1.reshape(1,200)*(fs/(2*np.pi))*t.reshape(1000,1))
+x_0=senal + noise_0
 #plt.plot(t,x[:,1])
 
 ####################
@@ -61,10 +71,10 @@ x_0=a1*np.sin(2*np.pi*omega_1.reshape(1,200)*(fs/(2*np.pi))*t.reshape(1000,1)) +
 ###Ya que hacer una matriz 3D me la complica al pedo
 ####################
 noise_1=np.random.normal(loc=0,scale=np.sqrt(noise_power[1]),size=(1000,200))
-
-var=np.var(noise)
-mean=np.mean(noise)
-x_1=a1*np.sin(2*np.pi*omega_1.reshape(1,200)*(fs/(2*np.pi))*t.reshape(1000,1)) + noise_1
+##Verificacion de la potencia de mi señal
+# var=np.var(noise)
+# mean=np.mean(noise)
+x_1=senal + noise_1
 
 ################################
 ###Calculo del periodograma con 3 dB
@@ -73,11 +83,10 @@ x_1=a1*np.sin(2*np.pi*omega_1.reshape(1,200)*(fs/(2*np.pi))*t.reshape(1000,1)) +
 #calculo el periodograma normal
 Pp=(1/N)*np.abs((fft(x_0,axis=0)))**2
 
-
 #Metodo de Welch
-f_welch,Pxx_den = sig.welch(x_0,nperseg=500,axis=0)
+f_welch,Pxx_den = sig.welch(x_0,fs=fs,nperseg=N/5,axis=0)
 
-###Grafico las salidas
+#%%Grafico las salidas
 plt.figure(figura)
 figura+=1
 ##Restrinjo las salidas para ver mas claramente los efectos del calculo
@@ -89,7 +98,47 @@ plt.figure(figura)
 figura+=1
 #plt.semilogy(f_welch,Pxx_den)
 plt.plot(f_welch,Pxx_den)
-plt.xlim(0.240,0.260)
+plt.xlim(240,260)
+############
+#Ya que spectrum no tiene ninguna implementacion para axis armo las comparaciones con 1 muestra a la vez
+############
+plt.figure(figura)
+figura+=1
+for i in range(len(fr)):
+    p_BT = spectrum.pcorrelogram(x_0[:,i], lag=15)
+    p_BT(); 
+    p_BT.plot(label='Correlogram(15)', norm=norm, sides=sides)
+plt.xlim(0.1,0.4)
+plt.ylim(-20,1)
+################################
+###Calculo del pico con 3dB
+################################
+
+indices_Pp_0=Pp.argmax(axis=0)
+
+indices_Pxx_den_0=Pxx_den.argmax(axis=0)
+
+################################
+### Calculo el error
+### Con los dos metodos para 3dB
+################################
+
+error_Pp_0=f[indices_Pp_0]-(omega_1*fs/(2*np.pi))
+
+error_Pxx_0=f_welch[indices_Pxx_den_0]-(omega_1*fs/(2*np.pi))
+
+media_Pp_0=np.mean(error_Pp_0)
+
+media_Pxx_0=np.mean(error_Pxx_0)
+
+################################
+### Calculo el error
+### Con los dos metodos para 3dB
+################################
+
+var_error_Pp_0=np.var(error_Pp_0)
+
+var_error_Pxx_0=np.var(error_Pxx_0)
 
 ################################
 ###Calculo del periodograma con 10 dB
@@ -99,7 +148,7 @@ plt.xlim(0.240,0.260)
 Pp=(1/N)*np.abs((fft(x_1,axis=0)))**2
 
 #Metodo de Welch
-f_welch,Pxx_den = sig.welch(x_1,nperseg=500,axis=0)
+f_welch,Pxx_den = sig.welch(x_1,fs=fs,nperseg=N/5,axis=0)
 
 ##Grafico las salidas
 plt.figure(figura)
@@ -114,12 +163,44 @@ plt.figure(figura)
 figura+=1
 #plt.semilogy(f_welch,Pxx_den)
 plt.plot(f_welch,Pxx_den)
-plt.xlim(0.240,0.260)
+plt.xlim(240,260)
 
+############
+#Ya que spectrum no tiene ninguna implementacion para axis armo las comparaciones con 1 muestra a la vez
+############
+plt.figure(figura)
+figura+=1
+for i in range(len(fr)):
+    p_BT = spectrum.pcorrelogram(x_1[:,i], lag=15)
+    p_BT(); 
+    p_BT.plot(label='Correlogram(15)', norm=norm, sides=sides)
+plt.xlim(0.1,0.4)
+plt.ylim(-20,1)
+################################
+###Calculo del pico con 10dB
+################################
 
-########
-###Al hacer el eje y semilog no se puede distinguir del todo que uno de los graficos tiene 10 dB y el otro 3
-########
+indices_Pp_1=Pp.argmax(axis=0)
+
+indices_Pxx_den_1=Pxx_den.argmax(axis=0)
+
+################################
+### Calculo el error
+### Con los dos metodos para 10dB
+################################
+
+error_Pp_1=f[indices_Pp_1]-(omega_1*fs/(2*np.pi))
+
+error_Pxx_1=f_welch[indices_Pxx_den_1]-(omega_1*fs/(2*np.pi))
+
+################################
+### Calculo la varianza
+### Con los dos metodos para 10dB
+################################
+
+var_error_Pp_1=np.var(error_Pp_1)
+
+var_error_Pxx_1=np.var(error_Pxx_1)
 
 ################################
 ###Calculo del periodograma con 3 dB y zero padding
@@ -132,7 +213,7 @@ Pp=(1/N)*np.abs((fft(x_0,n=10*N,axis=0)))**2
 
 
 #Metodo de Welch
-f_welch,Pxx_den = sig.welch(x_0,nperseg=500,nfft=10*N,axis=0)
+f_welch,Pxx_den = sig.welch(x_0,fs=fs,nperseg=N/5,nfft=10*N,axis=0)
 
 ###Grafico las salidas
 plt.figure(figura)
@@ -147,7 +228,26 @@ plt.figure(figura)
 figura+=1
 #plt.semilogy(f_welch,Pxx_den)
 plt.plot(f_welch,Pxx_den)
-plt.xlim(0.240,0.260)
+plt.xlim(240,260)
+
+############
+#Ya que spectrum no tiene ninguna implementacion para axis armo las comparaciones con 1 muestra a la vez
+############
+plt.figure(figura)
+figura+=1
+for i in range(len(fr)):
+    p_BT = spectrum.pcorrelogram(x_0[:,i], lag=15,NFFT=10*N)
+    p_BT(); 
+    p_BT.plot(label='Correlogram(15)', norm=norm, sides=sides)
+plt.xlim(0.1,0.4)
+plt.ylim(-20,1)
+################################
+###Calculo del pico con 3dB y zero padding
+################################
+
+indices_Pp_0=Pp.argmax(axis=0)
+
+indices_Pxx_den_0=Pxx_den.argmax(axis=0)
 
 ################################
 ###Calculo del periodograma con 10 dB y zero padding
@@ -157,7 +257,7 @@ plt.xlim(0.240,0.260)
 Pp=(1/N)*np.abs((fft(x_1,n=10*N,axis=0)))**2
 
 #Metodo de Welch
-f_welch,Pxx_den = sig.welch(x_1,nperseg=500,nfft=10*N,axis=0)
+f_welch,Pxx_den = sig.welch(x_1,fs=fs,nperseg=N/5,nfft=10*N,axis=0)
 
 ##Grafico las salidas
 plt.figure(figura)
@@ -172,7 +272,29 @@ plt.figure(figura)
 figura+=1
 #plt.semilogy(f_welch,Pxx_den)
 plt.plot(f_welch,Pxx_den)
-plt.xlim(0.240,0.260)
+plt.xlim(240,260)
+
+############
+#Ya que spectrum no tiene ninguna implementacion para axis armo las comparaciones con 1 muestra a la vez
+############
+plt.figure(figura)
+figura+=1
+for i in range(len(fr)):
+    p_BT = spectrum.pcorrelogram(x_1[:,i], lag=15,NFFT=10*N)
+    p_BT(); 
+    p_BT.plot(label='Correlogram(15)', norm=norm, sides=sides)
+plt.xlim(0.1,0.4)
+plt.ylim(-20,1)
+
+################################
+###Calculo del pico con 10 dB y zero padding
+################################
+
+indices_Pp_1=Pp.argmax(axis=0)
+
+indices_Pxx_den_1=Pxx_den.argmax(axis=0)
+
+
 
 ################################
 ###Calculo del periodograma con 3 dB, zero padding y otra ventana
@@ -190,7 +312,7 @@ Pp=(1/N)*np.abs((fft(x_0_Blackman,n=10*N,axis=0)))**2
 
 
 #Metodo de Welch
-f_welch,Pxx_den = sig.welch(x_0,window='blackman',nperseg=500,nfft=10*N,axis=0)
+f_welch,Pxx_den = sig.welch(x_0,fs=fs,nperseg=N/5,window='blackman',nfft=10*N,axis=0)
 
 ###Grafico las salidas
 plt.figure(figura)
@@ -205,7 +327,7 @@ plt.figure(figura)
 figura+=1
 #plt.semilogy(f_welch,Pxx_den)
 plt.plot(f_welch,Pxx_den)
-plt.xlim(0.240,0.260)
+plt.xlim(240,260)
 
 ################################
 ###Calculo del periodograma con 10 dB, zero padding y otra ventana
@@ -216,7 +338,7 @@ x_1_Blackman=x_1*Blackman.reshape(N,1)
 Pp=(1/N)*np.abs((fft(x_1_Blackman,n=10*N,axis=0)))**2
 
 #Metodo de Welch
-f_welch,Pxx_den = sig.welch(x_1,window='blackman',nperseg=500,nfft=10*N,axis=0)
+f_welch,Pxx_den = sig.welch(x_1,fs=fs,nperseg=N/5,window='blackman',nfft=10*N,axis=0)
 
 ##Grafico las salidas
 plt.figure(figura)
@@ -231,4 +353,25 @@ plt.figure(figura)
 figura+=1
 #plt.semilogy(f_welch,Pxx_den)
 plt.plot(f_welch,Pxx_den)
-plt.xlim(0.240,0.260)
+plt.xlim(240,260)
+
+############
+#Ya que spectrum no tiene ninguna implementacion para axis armo las comparaciones con 1 muestra a la vez
+############
+plt.figure(figura)
+figura+=1
+for i in range(len(fr)):
+    ##PAdeo con hasta 10 veces N de ceros
+    x_1_pad=np.resize(x_1,(10*N,200))
+    x_1_pad[:,i]=x_1_pad[:,i]*np.blackman(10*N)
+    p_BT = spectrum.pcorrelogram(x_1[:,i], lag=15,NFFT=10*N)
+    p_BT(); 
+    p_BT.plot(label='Correlogram(15)', norm=norm, sides=sides)
+plt.xlim(0.1,0.4)
+plt.ylim(-30,1)
+
+
+
+
+
+
