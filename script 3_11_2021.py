@@ -101,7 +101,7 @@ N_array=len(array_latidos)
 #Metodo de Welch paddeado para hacerlo mas suave
 #Pruebo ventanas: bartlett, hanning, blackman, flattop
 #Armar el solapamiento correspondiente para detectar los latidos
-f_welch,Pxx_den = sig.welch(array_latidos,fs=fs,nperseg=N_array/2,window='bartlett',nfft=10*N_array,axis=0)
+f_welch,Pxx_den = sig.welch(array_latidos,fs=fs,nperseg=N_array/2,window='bartlett',nfft=5*N_array,axis=0)
 
 #Imprimo el resultado
 plt.figure(figura)
@@ -119,7 +119,7 @@ figura+=1
 plt.plot(f_welch,10*np.log10(Pxx_den/Pxx_den.argmax()))
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('$Potencia (dB)$')
-#plt.ylim(-10,30)
+plt.ylim(-10,30)
 plt.xlim(0,35)
 
 #%% Con lo anterior puedo estimar que tengo 2 señales aunque 1 de ellas tiene menos energia que la otra...

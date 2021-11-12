@@ -65,7 +65,6 @@ noise_0=np.random.normal(loc=0,scale=np.sqrt(noise_power[0]),size=(1000,200))
 senal=np.sqrt(2*a1)*np.sin(2*np.pi*omega_1.reshape(1,200)*(fs/(2*np.pi))*t.reshape(1000,1))
 x_0=senal + noise_0
 #plt.plot(t,x[:,1])
-
 ####################
 ###Segundo experimento con 10dB
 ###Ya que hacer una matriz 3D me la complica al pedo
@@ -76,6 +75,8 @@ noise_1=np.random.normal(loc=0,scale=np.sqrt(noise_power[1]),size=(1000,200))
 # mean=np.mean(noise)
 x_1=senal + noise_1
 
+lag0=int (len(x_0)/10)
+lag1=int (len(x_1)/10)
 ################################
 ###Calculo del periodograma con 3 dB
 ################################
@@ -105,7 +106,7 @@ plt.xlim(240,260)
 plt.figure(figura)
 figura+=1
 for i in range(len(fr)):
-    p_BT = spectrum.pcorrelogram(x_0[:,i], lag=15)
+    p_BT = spectrum.pcorrelogram(x_0[:,i], lag=lag0)
     p_BT(); 
     p_BT.plot(label='Correlogram(15)', norm=norm, sides=sides)
 plt.xlim(0.1,0.4)
@@ -171,7 +172,7 @@ plt.xlim(240,260)
 plt.figure(figura)
 figura+=1
 for i in range(len(fr)):
-    p_BT = spectrum.pcorrelogram(x_1[:,i], lag=15)
+    p_BT = spectrum.pcorrelogram(x_1[:,i], lag=lag1)
     p_BT(); 
     p_BT.plot(label='Correlogram(15)', norm=norm, sides=sides)
 plt.xlim(0.1,0.4)
@@ -236,7 +237,7 @@ plt.xlim(240,260)
 plt.figure(figura)
 figura+=1
 for i in range(len(fr)):
-    p_BT = spectrum.pcorrelogram(x_0[:,i], lag=15,NFFT=10*N)
+    p_BT = spectrum.pcorrelogram(x_0[:,i], lag=lag0,NFFT=10*N)
     p_BT(); 
     p_BT.plot(label='Correlogram(15)', norm=norm, sides=sides)
 plt.xlim(0.1,0.4)
@@ -280,21 +281,11 @@ plt.xlim(240,260)
 plt.figure(figura)
 figura+=1
 for i in range(len(fr)):
-    p_BT = spectrum.pcorrelogram(x_1[:,i], lag=15,NFFT=10*N)
+    p_BT = spectrum.pcorrelogram(x_1[:,i], lag=lag1,NFFT=10*N)
     p_BT(); 
     p_BT.plot(label='Correlogram(15)', norm=norm, sides=sides)
 plt.xlim(0.1,0.4)
 plt.ylim(-20,1)
-
-################################
-###Calculo del pico con 10 dB y zero padding
-################################
-
-indices_Pp_1=Pp.argmax(axis=0)
-
-indices_Pxx_den_1=Pxx_den.argmax(axis=0)
-
-
 
 ################################
 ###Calculo del periodograma con 3 dB, zero padding y otra ventana
@@ -364,7 +355,7 @@ for i in range(len(fr)):
     ##PAdeo con hasta 10 veces N de ceros
     x_1_pad=np.resize(x_1,(10*N,200))
     x_1_pad[:,i]=x_1_pad[:,i]*np.blackman(10*N)
-    p_BT = spectrum.pcorrelogram(x_1[:,i], lag=15,NFFT=10*N)
+    p_BT = spectrum.pcorrelogram(x_1[:,i], lag=lag1,NFFT=10*N)
     p_BT(); 
     p_BT.plot(label='Correlogram(15)', norm=norm, sides=sides)
 plt.xlim(0.1,0.4)
