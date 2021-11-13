@@ -112,7 +112,7 @@ for i in range(len(fr)):
 plt.xlim(0.1,0.4)
 plt.ylim(-20,1)
 ################################
-###Calculo del pico con 3dB
+#%%Calculo del pico con 3dB
 ################################
 
 indices_Pp_0=Pp.argmax(axis=0)
@@ -142,7 +142,7 @@ var_error_Pp_0=np.var(error_Pp_0)
 var_error_Pxx_0=np.var(error_Pxx_0)
 
 ################################
-###Calculo del periodograma con 10 dB
+#%%Calculo del periodograma con 10 dB
 ################################
 
 #calculo el periodograma normal
@@ -178,7 +178,7 @@ for i in range(len(fr)):
 plt.xlim(0.1,0.4)
 plt.ylim(-20,1)
 ################################
-###Calculo del pico con 10dB
+#%%Calculo del pico con 10dB
 ################################
 
 indices_Pp_1=Pp.argmax(axis=0)
@@ -194,6 +194,10 @@ error_Pp_1=f[indices_Pp_1]-(omega_1*fs/(2*np.pi))
 
 error_Pxx_1=f_welch[indices_Pxx_den_1]-(omega_1*fs/(2*np.pi))
 
+media_Pp_1=np.mean(error_Pp_1)
+
+media_Pxx_1=np.mean(error_Pxx_1)
+
 ################################
 ### Calculo la varianza
 ### Con los dos metodos para 10dB
@@ -204,7 +208,7 @@ var_error_Pp_1=np.var(error_Pp_1)
 var_error_Pxx_1=np.var(error_Pxx_1)
 
 ################################
-###Calculo del periodograma con 3 dB y zero padding
+#%%Calculo del periodograma con 3 dB y zero padding
 ################################
 #Creo un nuevo vector f para los calculos
 f_padded=np.arange(0,fs,fs/(10*N))
@@ -242,13 +246,6 @@ for i in range(len(fr)):
     p_BT.plot(label='Correlogram(15)', norm=norm, sides=sides)
 plt.xlim(0.1,0.4)
 plt.ylim(-20,1)
-################################
-###Calculo del pico con 3dB y zero padding
-################################
-
-indices_Pp_0=Pp.argmax(axis=0)
-
-indices_Pxx_den_0=Pxx_den.argmax(axis=0)
 
 ################################
 ###Calculo del periodograma con 10 dB y zero padding
@@ -363,6 +360,37 @@ plt.ylim(-30,1)
 
 
 
+#######################
+#%%Calculo de sesgo y varianza
+#######################
 
+#Sesgo: s = mu - a0
 
+s_Periodo_3dB = media_Pp_0
+s_Welch_3dB = media_Pxx_0
+
+s_Periodo_10dB = media_Pp_1
+s_Welch_10dB = media_Pxx_1
+
+#Varianza: Var(x)=E[(X-mu)**2]
+#Se calculo previamente
+print("Varianza Periodograma 3dB =",var_error_Pp_0 )
+print("Varianza Periodograma 10dB =",var_error_Pp_1 )
+print("Varianza Welch 3dB =",var_error_Pxx_0 )
+print("Varianza Welch 10dB =",var_error_Pxx_1 )
+# Muestro los datos
+
+data = [[s_Periodo_3dB, var_error_Pp_0],
+        [s_Periodo_10dB, var_error_Pp_1],
+        [s_Welch_3dB, var_error_Pxx_0],
+        [s_Welch_10dB, var_error_Pxx_1]]
+
+df = DataFrame(data,columns=['$s_a$', '$v_a$'],
+                index=[  
+                        'Periodograma 3dB',
+                        'Periodograma 10dB',
+                        'Welch 3dB',
+                        'Welch 10dB'
+                      ])
+HTML(df.to_html())
 
