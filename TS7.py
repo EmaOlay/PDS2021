@@ -92,19 +92,19 @@ x_Flattop_mag=np.abs(x_Flattop_fft)
 #Ploteo histogramas
 #######################
 a1_g_rectangular=np.abs(x_rectangular_mag[250])
-plt.hist(a1_g_rectangular,bins='auto')
+plt.hist(a1_g_rectangular,bins=20)
 
 a1_g_Bartlett=np.abs(x_Bartlett_mag[250])
-plt.hist(a1_g_Bartlett,bins='auto')
+plt.hist(a1_g_Bartlett,bins=20)
 
 a1_g_Hann=np.abs(x_Hann_mag[250])
-plt.hist(a1_g_Hann,bins='auto')
+plt.hist(a1_g_Hann,bins=20)
 
 a1_g_Blackman=np.abs(x_Blackman_mag[250])
-plt.hist(a1_g_Blackman,bins='auto')
+plt.hist(a1_g_Blackman,bins=20)
 
 a1_g_Flattop=np.abs(x_Flattop_mag[250])
-plt.hist(a1_g_Flattop,bins='auto')
+plt.hist(a1_g_Flattop,bins=20)
 plt.title('Histograma de los estimadores')
 plt.ylabel('Veces')
 plt.xlabel('Bin')
