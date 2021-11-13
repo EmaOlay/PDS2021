@@ -236,9 +236,9 @@ with np.errstate(divide='ignore', invalid='ignore'):
 plt.plot(f,Bartlett_response)
 plt.title('FFT: Bartlett_window')
 plt.xlabel('Frecuencia [Hz]')
-plt.xlim(490,500)
+plt.xlim(500,520)
 plt.ylabel('Magnitud [dB')
-plt.ylim(-50,2)
+plt.ylim(-80,2)
 plt.show()
 
 #Hann
@@ -292,101 +292,13 @@ plt.title('FFT: Flattop window')
 plt.xlabel('Frecuencia [Hz]')
 plt.xlim(475,525)
 plt.ylabel('Magnitud [dB')
-plt.ylim(-100,0)
+plt.ylim(-140,2)
 plt.show()
 
 #######################################################################################################################
 #%% Hallo las frecuencias
 #######################################################################################################################
-##Como mis respuestas estan centradas en 500 hz
-##el primer max y el primer min lo busco pasado la mitad del array
-print('Para Rectangular 0 dB indice:',find_nearest(Rectangular_response, 0))
-print('Frecuencia hallada=',f[find_nearest(Rectangular_response, 0)])
-print('Para Rectangular -3 dB indice:',find_nearest(Rectangular_response, -3))
-print('Frecuencia hallada=',f[find_nearest(Rectangular_response, -3)])
-##Como mis respuestas estan centradas en 500 hz
-##el primer max y el primer min lo busco pasado la mitad del array
-mitad_superior=Rectangular_response[len(Rectangular_response)//2:]
-mitad_f=len(f)/2
-##El primer 0 a ojo vale -346 asique le busco eso todos los demas deberian ser mas profundos
-primer_cero=find_nearest(mitad_superior,-346.808)
-print('Para Rectangular -inf dB indice:',primer_cero)
-indice=int(mitad_f+primer_cero)
-print('Frecuencia hallada=',f[indice])
-print('Para Rectangular maximo primer lobulo indice:',find_nearest(mitad_superior[primer_cero:], 0),'por encima del primer cero')
-print('Osea:',primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
-indice=int(mitad_f+primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
-print('Frecuencia hallada=',f[indice])
-
-print('Para Bartlett 0 dB indice:',find_nearest(Bartlett_response, 0))
-print('Frecuencia hallada=',f[find_nearest(Bartlett_response, 0)])
-print('Para Bartlett -3 dB indice:',find_nearest(Bartlett_response, -3))
-print('Frecuencia hallada=',f[find_nearest(Bartlett_response, -3)])
-##Como mis respuestas estan centradas en 500 hz
-##el primer max y el primer min lo busco pasado la mitad del array
-mitad_superior=Bartlett_response[len(Bartlett_response)//2:]
-mitad_f=len(f)/2
-##El primer 0 a ojo vale -300 asique le busco eso todos los demas deberian ser mas profundos
-primer_cero=find_nearest(mitad_superior,-300)
-print('Para Bartlett -inf dB indice:',primer_cero)
-indice=int(mitad_f+primer_cero)
-print('Frecuencia hallada=',f[indice])
-print('Para Bartlett maximo primer lobulo indice:',find_nearest(mitad_superior[primer_cero:], 0),'por encima del primer cero')
-print('Osea:',primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
-indice=int(mitad_f+primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
-print('Frecuencia hallada=',f[indice])
-
-print('Para Hann 0 dB indice:',find_nearest(Hann_response, 0))
-print('Frecuencia hallada=',f[find_nearest(Hann_response, 0)])
-print('Para Hann -3 dB indice:',find_nearest(Hann_response, -3))
-print('Frecuencia hallada=',f[find_nearest(Hann_response, -3)])
-##Como mis respuestas estan centradas en 500 hz
-##el primer max y el primer min lo busco pasado la mitad del array
-mitad_superior=Hann_response[len(Hann_response)//2:]
-##El primer 0 a ojo vale -69 asique le busco eso todos los demas deberian ser mas profundos
-primer_cero=find_nearest(mitad_superior,-69)
-print('Para Hann -inf dB indice:',primer_cero)
-indice=int(mitad_f+primer_cero)
-print('Frecuencia hallada=',f[indice])
-print('Para Hann maximo primer lobulo indice:',find_nearest(mitad_superior[primer_cero:], 0),'por encima del primer cero')
-print('Osea:',primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
-indice=int(mitad_f+primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
-print('Frecuencia hallada=',f[indice])
-
-print('Para Blackman 0 dB indice:',find_nearest(Blackman_response, 0))
-print('Frecuencia hallada=',f[find_nearest(Blackman_response, 0)])
-print('Para Blackman -3 dB indice:',find_nearest(Blackman_response, -3))
-print('Frecuencia hallada=',f[find_nearest(Blackman_response, -3)])
-##Como mis respuestas estan centradas en 500 hz
-##el primer max y el primer min lo busco pasado la mitad del array
-mitad_superior=Blackman_response[len(Blackman_response)//2:]
-##El primer 0 a ojo vale -108 asique le busco eso todos los demas deberian ser mas profundos
-primer_cero=find_nearest(mitad_superior,-108)
-print('Para Blackman -inf dB indice:',primer_cero)
-indice=int(mitad_f+primer_cero)
-print('Frecuencia hallada=',f[indice])
-print('Para Blackman maximo primer lobulo indice:',find_nearest(mitad_superior[primer_cero:], 0),'por encima del primer cero')
-print('Osea:',primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
-indice=int(mitad_f+primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
-print('Frecuencia hallada=',f[indice])
-
-print('Para Flattop 0 dB indice:',find_nearest(Flattop_response, 0))
-print('Frecuencia hallada=',f[find_nearest(Flattop_response, 0)])
-print('Para Flattop -3 dB indice:',find_nearest(Flattop_response, -3))
-print('Frecuencia hallada=',f[find_nearest(Flattop_response, -3)])
-##Como mis respuestas estan centradas en 500 hz
-##el primer max y el primer min lo busco pasado la mitad del array
-mitad_superior=Flattop_response[len(Flattop_response)//2:]
-##El primer 0 a ojo vale -108 asique le busco eso todos los demas deberian ser mas profundos
-primer_cero=find_nearest(mitad_superior,-108)
-print('Para Flattop -inf dB indice:',primer_cero)
-indice=int(mitad_f+primer_cero)
-print('Frecuencia hallada=',f[indice])
-print('Para Flattop maximo primer lobulo indice:',find_nearest(mitad_superior[primer_cero:], 0),'por encima del primer cero')
-print('Osea:',primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
-indice=int(mitad_f+primer_cero+find_nearest(mitad_superior[primer_cero:], 0))
-print('Frecuencia hallada=',f[indice])
-
+##Por inspeccion grafica
 #######################################################################################################################
 #%% Armo el filtrado
 #######################################################################################################################
@@ -489,14 +401,15 @@ plt.show()
 #######################################
 factor_de_normalizacion=(fs/N)
 tus_resultados = [ 
-                   [501, 499.6], # <-- acá debería haber numeritos :)
-                   [502, 499.40000000000003], # <-- acá debería haber numeritos :)
-                   [509.6/factor_de_normalizacion, 499.3/factor_de_normalizacion], # <-- acá debería haber numeritos :)
-                   [532.5/factor_de_normalizacion, 499.20000000000005/factor_de_normalizacion], # <-- acá debería haber numeritos :)
-                   [547.1/factor_de_normalizacion, 498.1/factor_de_normalizacion] # <-- acá debería haber numeritos :)
+                   [501/factor_de_normalizacion, 500.4/factor_de_normalizacion,-13.3], # <-- acá debería haber numeritos :)
+                   [502/factor_de_normalizacion, 500.6/factor_de_normalizacion,-26.5], # <-- acá debería haber numeritos :)
+                   [502/factor_de_normalizacion, 500.71/factor_de_normalizacion,-31.5], # <-- acá debería haber numeritos :)
+                   [503/factor_de_normalizacion, 500.8/factor_de_normalizacion,-58.25], # <-- acá debería haber numeritos :)
+                   [505.025/factor_de_normalizacion, 501.86/factor_de_normalizacion,-94] # <-- acá debería haber numeritos :)
                  ]
+
 tus_resultados=np.abs(np.array(tus_resultados)-500)/10
-df = DataFrame(tus_resultados, columns=['$\Omega_0$', '$W_2$'],
+df = DataFrame(tus_resultados, columns=['$\Omega_0$(cruce por 0)', '$\Omega_1$(-3dB)','$W_2$(max Tranf secun)'],
                index=[  
                         'Rectangular',
                         'Bartlett',
