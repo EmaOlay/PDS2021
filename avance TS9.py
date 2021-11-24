@@ -34,6 +34,10 @@ ecg= mat_struct['ecg_lead']
 
 qrs_detections = mat_struct['qrs_detections']
 
+patron1= mat_struct['heartbeat_pattern1']
+
+patron2= mat_struct['heartbeat_pattern2']
+
 N=len(ecg)
 
 muestras_tot=np.arange(0,N,1)
